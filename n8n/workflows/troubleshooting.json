@@ -1,0 +1,167 @@
+{
+  "name": "Recepcao de Alertas - Auto Troubleshooting",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "alert",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "b2e6f1d2-4f8c-4a1b-9b0f-6c7d7b1c2a10"
+    },
+    {
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const required = ['service_name', 'namespace', 'pod_name', 'error_message'];\nconst item = $input.first().json;\nconst payload = item?.body ?? item;\nconst missing = required.filter((field) => !payload?.[field]);\n\nreturn [\n  {\n    json: {\n      ...payload,\n      isValid: missing.length === 0,\n      missing,\n      errorMessage: missing.length\n        ? `Campos obrigatórios faltando: ${missing.join(', ')}`\n        : null,\n    },\n  },\n];"
+      },
+      "id": "2",
+      "name": "Validar Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.isValid}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Payload valido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const alert = $json;\nconsole.log('[ALERT] Webhook recebido', JSON.stringify(alert));\nreturn $input.all();"
+      },
+      "id": "4",
+      "name": "Log Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 240]
+    },
+    {
+      "parameters": {
+        "responseBody": "ok",
+        "responseData": "text",
+        "responseCode": 200
+      },
+      "id": "5",
+      "name": "Responder 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1080, 240]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "error",
+              "value": "={{$json.errorMessage}}"
+            }
+          ]
+        }
+      },
+      "id": "6",
+      "name": "Montar Erro",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [860, 380]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{$json.error}}",
+        "responseData": "text",
+        "responseCode": 400
+      },
+      "id": "7",
+      "name": "Responder 400",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1080, 380]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validar Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Payload": {
+      "main": [
+        [
+          {
+            "node": "Payload valido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload valido?": {
+      "main": [
+        [
+          {
+            "node": "Log Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Montar Erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Alert": {
+      "main": [
+        [
+          {
+            "node": "Responder 200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Erro": {
+      "main": [
+        [
+          {
+            "node": "Responder 400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

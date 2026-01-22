@@ -1,4 +1,4 @@
-## status: pending
+## status: done
 
 <task_context>
 <domain>infra/n8n</domain>
@@ -24,12 +24,12 @@ Configurar o n8n para receber webhooks do Elastic Stack contendo alertas de erro
 
 ## Subtarefas
 
-- [ ] 2.1 Criar workflow base no n8n com nó Webhook
-- [ ] 2.2 Implementar validação de campos obrigatórios (service_name, error_message, pod_name, namespace)
-- [ ] 2.3 Configurar resposta de erro 400 para payload inválido
-- [ ] 2.4 Adicionar nó de log para rastreabilidade
-- [ ] 2.5 Exportar workflow como JSON para versionamento
-- [ ] 2.6 Testar webhook com payloads de exemplo (fixtures)
+- [x] 2.1 Criar workflow base no n8n com nó Webhook
+- [x] 2.2 Implementar validação de campos obrigatórios (service_name, error_message, pod_name, namespace)
+- [x] 2.3 Configurar resposta de erro 400 para payload inválido
+- [x] 2.4 Adicionar nó de log para rastreabilidade
+- [x] 2.5 Exportar workflow como JSON para versionamento
+- [x] 2.6 Testar webhook com payloads de exemplo (fixtures)
 
 ## Detalhes de Implementação
 
@@ -90,12 +90,12 @@ return $input.all();
 
 ## Critérios de Sucesso
 
-- [ ] Webhook responde em `/webhook/alert` via POST
-- [ ] Payload válido retorna status 200
-- [ ] Payload sem campos obrigatórios retorna status 400 com mensagem clara
-- [ ] Tempo de processamento do webhook < 5 segundos
-- [ ] Workflow exportado em `n8n/workflows/troubleshooting.json`
-- [ ] Testes com os 3 fixtures (OOMKilled, NPE, Timeout) passam
+- [x] Webhook responde em `/webhook/alert` via POST
+- [x] Payload válido retorna status 200
+- [x] Payload sem campos obrigatórios retorna status 400 com mensagem clara
+- [x] Tempo de processamento do webhook < 5 segundos
+- [x] Workflow exportado em `n8n/workflows/troubleshooting.json`
+- [x] Testes com os 3 fixtures (OOMKilled, NPE, Timeout) passam
 
 ## Referências
 
