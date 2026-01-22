@@ -1,4 +1,4 @@
-## status: pending
+## status: done
 
 <task_context>
 <domain>n8n/llm</domain>
@@ -24,13 +24,13 @@ Configurar a integração com LLM (Gemini 3.0 ou GPT 5.2) no workflow n8n e impl
 
 ## Subtarefas
 
-- [ ] 6.1 Configurar credenciais do LLM no n8n
-- [ ] 6.2 Criar system prompt com instruções de diagnóstico
-- [ ] 6.3 Adicionar instruções de segurança (NUNCA expor secrets)
-- [ ] 6.4 Implementar nó de triagem (classificação inicial)
-- [ ] 6.5 Implementar lógica de roteamento por classificação
-- [ ] 6.6 Configurar timeout de 60 segundos
-- [ ] 6.7 Testar com os 3 cenários de exemplo
+- [x] 6.1 Configurar credenciais do LLM no n8n
+- [x] 6.2 Criar system prompt com instruções de diagnóstico
+- [x] 6.3 Adicionar instruções de segurança (NUNCA expor secrets)
+- [x] 6.4 Implementar nó de triagem (classificação inicial)
+- [x] 6.5 Implementar lógica de roteamento por classificação
+- [x] 6.6 Configurar timeout de 60 segundos
+- [x] 6.7 Testar com os 3 cenários de exemplo
 
 ## Detalhes de Implementação
 
