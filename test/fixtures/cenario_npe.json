@@ -1,0 +1,9 @@
+{
+  "service_name": "order-service",
+  "namespace": "production",
+  "pod_name": "order-service-xyz789",
+  "error_message": "java.lang.NullPointerException",
+  "stack_trace": "at com.example.OrderService.process(OrderService.java:42)\nat com.example.OrderController.handle(OrderController.java:28)",
+  "timestamp": "2026-01-21T11:15:00Z",
+  "severity": "error"
+}

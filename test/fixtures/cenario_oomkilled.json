@@ -1,0 +1,9 @@
+{
+  "service_name": "payment-service",
+  "namespace": "production",
+  "pod_name": "payment-service-abc123",
+  "error_message": "Container killed due to OOMKilled",
+  "stack_trace": null,
+  "timestamp": "2026-01-21T10:30:00Z",
+  "severity": "error"
+}

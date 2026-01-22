@@ -1,0 +1,75 @@
+services:
+  # =============================================================================
+  # PostgreSQL - Banco de Dados para Tickets de Diagnóstico
+  # =============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: troubleshooting-postgres
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./api/src/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-troubleshooting}
+      POSTGRES_USER: ${POSTGRES_USER:-troubleshooting}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-in-production}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-troubleshooting} -d ${POSTGRES_DB:-troubleshooting}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - troubleshooting-network
+
+  # =============================================================================
+  # n8n - Orquestrador de Workflows
+  # =============================================================================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: troubleshooting-n8n
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/home/node/workflows:ro
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-change-me-in-production}
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      # Conexão com PostgreSQL para persistência do n8n
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-troubleshooting}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-troubleshooting}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-change-me-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - troubleshooting-network
+
+# =============================================================================
+# Volumes Persistentes
+# =============================================================================
+volumes:
+  postgres_data:
+    name: troubleshooting-postgres-data
+  n8n_data:
+    name: troubleshooting-n8n-data
+
+# =============================================================================
+# Rede Interna
+# =============================================================================
+networks:
+  troubleshooting-network:
+    name: troubleshooting-network
+    driver: bridge

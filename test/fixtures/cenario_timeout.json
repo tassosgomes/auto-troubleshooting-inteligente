@@ -1,0 +1,9 @@
+{
+  "service_name": "inventory-service",
+  "namespace": "production",
+  "pod_name": "inventory-service-def456",
+  "error_message": "Connection timeout to https://api.external.com/v1/stock",
+  "stack_trace": "java.net.SocketTimeoutException: connect timed out\n  at java.net.PlainSocketImpl.socketConnect(Native Method)\n  at com.example.InventoryClient.fetchStock(InventoryClient.java:87)",
+  "timestamp": "2026-01-21T14:45:00Z",
+  "severity": "error"
+}
