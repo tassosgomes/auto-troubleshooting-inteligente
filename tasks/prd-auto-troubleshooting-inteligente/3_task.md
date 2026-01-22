@@ -1,4 +1,4 @@
-## status: pending
+## status: done
 
 <task_context>
 <domain>mcp-server/kubernetes</domain>
@@ -24,18 +24,18 @@ Implementar o MCP Server com ferramentas (tools) para interação read-only com 
 
 ## Subtarefas
 
-- [ ] 3.1 Criar projeto Node.js/TypeScript para MCP Server
-- [ ] 3.2 Configurar MCP SDK (@modelcontextprotocol/sdk)
-- [ ] 3.3 Configurar cliente Kubernetes (@kubernetes/client-node)
-- [ ] 3.4 Implementar tool `describePod`
-- [ ] 3.5 Implementar tool `getEvents`
-- [ ] 3.6 Implementar tool `getDeployment`
-- [ ] 3.7 Implementar tool `getConfigMapKeys`
-- [ ] 3.8 Implementar tool `getSecretKeys` (apenas nomes, NUNCA valores)
-- [ ] 3.9 Criar Dockerfile para o MCP Server
-- [ ] 3.10 Adicionar ao docker-compose.yml
-- [ ] 3.11 Criar manifesto RBAC (ClusterRole read-only)
-- [ ] 3.12 Testar tools com cluster de desenvolvimento
+- [x] 3.1 Criar projeto Node.js/TypeScript para MCP Server
+- [x] 3.2 Configurar MCP SDK (@modelcontextprotocol/sdk)
+- [x] 3.3 Configurar cliente Kubernetes (@kubernetes/client-node)
+- [x] 3.4 Implementar tool `describePod`
+- [x] 3.5 Implementar tool `getEvents`
+- [x] 3.6 Implementar tool `getDeployment`
+- [x] 3.7 Implementar tool `getConfigMapKeys`
+- [x] 3.8 Implementar tool `getSecretKeys` (apenas nomes, NUNCA valores)
+- [x] 3.9 Criar Dockerfile para o MCP Server
+- [x] 3.10 Adicionar ao docker-compose.yml
+- [x] 3.11 Criar manifesto RBAC (ClusterRole read-only)
+- [x] 3.12 Testar tools com cluster de desenvolvimento
 
 ## Detalhes de Implementação
 

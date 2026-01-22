@@ -60,6 +60,26 @@ services:
     networks:
       - troubleshooting-network
 
+  # =============================================================================
+  # MCP Server - Ferramentas Kubernetes (read-only)
+  # =============================================================================
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: troubleshooting-mcp-server
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - KUBECONFIG=/home/node/.kube/config
+    volumes:
+      - type: bind
+        source: ${HOME}/.kube
+        target: /home/node/.kube
+        read_only: true
+    networks:
+      - troubleshooting-network
+
 # =============================================================================
 # Volumes Persistentes
 # =============================================================================
