@@ -1,4 +1,4 @@
-## status: pending
+## status: done
 
 <task_context>
 <domain>mcp-server/git</domain>
@@ -24,15 +24,15 @@ Implementar tools no MCP Server para clonagem e leitura de repositórios Git via
 
 ## Subtarefas
 
-- [ ] 4.1 Instalar dependência simple-git
-- [ ] 4.2 Implementar tool `cloneRepo` com shallow clone
-- [ ] 4.3 Implementar tool `readFile` para ler arquivo específico
-- [ ] 4.4 Implementar tool `listFiles` para listar diretório
-- [ ] 4.5 Implementar tool `cleanupRepo` para remover clone
-- [ ] 4.6 Configurar SSH agent para múltiplas chaves (GitHub + Azure DevOps)
-- [ ] 4.7 Implementar timeout para operações de clone
-- [ ] 4.8 Adicionar tratamento de erro para repositório inacessível
-- [ ] 4.9 Testar com repositórios de exemplo
+- [x] 4.1 Instalar dependência simple-git
+- [x] 4.2 Implementar tool `cloneRepo` com shallow clone
+- [x] 4.3 Implementar tool `readFile` para ler arquivo específico
+- [x] 4.4 Implementar tool `listFiles` para listar diretório
+- [x] 4.5 Implementar tool `cleanupRepo` para remover clone
+- [x] 4.6 Configurar SSH agent para múltiplas chaves (GitHub + Azure DevOps)
+- [x] 4.7 Implementar timeout para operações de clone
+- [x] 4.8 Adicionar tratamento de erro para repositório inacessível
+- [x] 4.9 Testar com repositórios de exemplo
 
 ## Detalhes de Implementação
 

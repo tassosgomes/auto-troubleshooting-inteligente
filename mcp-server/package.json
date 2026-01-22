@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@kubernetes/client-node": "^1.4.0",
-    "@modelcontextprotocol/sdk": "^1.25.3"
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "simple-git": "^3.30.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.10",

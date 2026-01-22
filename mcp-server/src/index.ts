@@ -11,6 +11,13 @@ import {
   getEvents,
   getSecretKeys,
 } from "./tools/kubernetes.js";
+import { setupSSHAgent } from "./config/ssh.js";
+import {
+  cleanupRepo,
+  cloneRepo,
+  listFiles,
+  readFile,
+} from "./tools/git.js";
 
 const server = new Server(
   {
@@ -86,6 +93,53 @@ const tools = [
       required: ["namespace", "secretName"],
     },
   },
+  {
+    name: "cloneRepo",
+    description: "Clona repositório Git via SSH usando shallow clone.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        repoUrl: { type: "string" },
+        branch: { type: "string" },
+      },
+      required: ["repoUrl", "branch"],
+    },
+  },
+  {
+    name: "readFile",
+    description: "Lê um arquivo específico do repositório clonado.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        repoPath: { type: "string" },
+        filePath: { type: "string" },
+      },
+      required: ["repoPath", "filePath"],
+    },
+  },
+  {
+    name: "listFiles",
+    description: "Lista arquivos em um diretório do repositório clonado.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        repoPath: { type: "string" },
+        directory: { type: "string" },
+      },
+      required: ["repoPath", "directory"],
+    },
+  },
+  {
+    name: "cleanupRepo",
+    description: "Remove o diretório temporário clonado.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        repoPath: { type: "string" },
+      },
+      required: ["repoPath"],
+    },
+  },
 ];
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
@@ -145,12 +199,52 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
       };
     }
+    case "cloneRepo": {
+      const { repoUrl, branch } = args as {
+        repoUrl: string;
+        branch: string;
+      };
+      const result = await cloneRepo(repoUrl, branch);
+      return {
+        content: [{ type: "text", text: result }],
+      };
+    }
+    case "readFile": {
+      const { repoPath, filePath } = args as {
+        repoPath: string;
+        filePath: string;
+      };
+      const result = await readFile(repoPath, filePath);
+      return {
+        content: [{ type: "text", text: result }],
+      };
+    }
+    case "listFiles": {
+      const { repoPath, directory } = args as {
+        repoPath: string;
+        directory: string;
+      };
+      const result = await listFiles(repoPath, directory);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+    case "cleanupRepo": {
+      const { repoPath } = args as {
+        repoPath: string;
+      };
+      await cleanupRepo(repoPath);
+      return {
+        content: [{ type: "text", text: "Cleanup concluído" }],
+      };
+    }
     default:
       throw new Error(`Tool desconhecida: ${name}`);
   }
 });
 
 async function main() {
+  setupSSHAgent();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
