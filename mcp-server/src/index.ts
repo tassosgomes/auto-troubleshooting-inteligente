@@ -18,6 +18,7 @@ import {
   listFiles,
   readFile,
 } from "./tools/git.js";
+import { httpRequest } from "./tools/network.js";
 
 const server = new Server(
   {
@@ -140,6 +141,23 @@ const tools = [
       required: ["repoPath"],
     },
   },
+  {
+    name: "httpRequest",
+    description: "Executa requisição HTTP/HTTPS para testar conectividade.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "URL completa (http:// ou https://)" },
+        method: {
+          type: "string",
+          enum: ["GET", "POST", "HEAD"],
+          default: "GET",
+        },
+        timeout: { type: "number", description: "Timeout em ms", default: 10000 },
+      },
+      required: ["url"],
+    },
+  },
 ];
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
@@ -236,6 +254,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       await cleanupRepo(repoPath);
       return {
         content: [{ type: "text", text: "Cleanup concluído" }],
+      };
+    }
+    case "httpRequest": {
+      const { url, method, timeout } = args as {
+        url: string;
+        method?: string;
+        timeout?: number;
+      };
+      const result = await httpRequest(url, method, timeout);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
       };
     }
     default:

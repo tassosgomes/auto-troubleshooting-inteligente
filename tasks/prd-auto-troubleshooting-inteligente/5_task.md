@@ -1,4 +1,4 @@
-## status: pending
+## status: done
 
 <task_context>
 <domain>mcp-server/network</domain>
@@ -23,11 +23,11 @@ Implementar tool no MCP Server para teste de conectividade HTTP/HTTPS. Permite v
 
 ## Subtarefas
 
-- [ ] 5.1 Implementar tool `httpRequest`
-- [ ] 5.2 Configurar timeout padrão (10 segundos)
-- [ ] 5.3 Capturar e retornar tempo de resposta
-- [ ] 5.4 Tratar erros de conexão (timeout, DNS, refused)
-- [ ] 5.5 Testar com URLs de exemplo
+- [x] 5.1 Implementar tool `httpRequest`
+- [x] 5.2 Configurar timeout padrão (10 segundos)
+- [x] 5.3 Capturar e retornar tempo de resposta
+- [x] 5.4 Tratar erros de conexão (timeout, DNS, refused)
+- [x] 5.5 Testar com URLs de exemplo
 
 ## Detalhes de Implementação
 
@@ -153,3 +153,12 @@ const networkTools = [
 
 - PRD: F-005 (Teste de Conectividade)
 - Tech Spec: Seção "Interface MCP - Network Tools"
+
+## Checklist de Conclusão
+
+- [x] 5.0 Desenvolver MCP Server - Tools Network ✅ CONCLUÍDA
+  - [x] 5.1 Implementação completada
+  - [x] 5.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 5.3 Análise de regras e conformidade verificadas
+  - [x] 5.4 Revisão de código completada
+  - [x] 5.5 Pronto para deploy
