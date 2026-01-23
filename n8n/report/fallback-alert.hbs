@@ -1,0 +1,51 @@
+# ⚠️ Alerta de Erro - Análise Automática Indisponível
+
+**Ticket ID:** {{ticket_id}}
+**Data:** {{timestamp}}
+**Serviço:** {{service_name}}
+**Namespace:** {{namespace}}
+
+---
+
+## Aviso
+
+O sistema de Auto-Troubleshooting não conseguiu completar a análise automática deste incidente.
+
+**Motivo:** {{fallback_reason}}
+
+---
+
+## Alerta Original
+
+**Erro:**
+```
+{{error_message}}
+```
+
+{{#if stack_trace}}
+**Stack Trace:**
+```
+{{stack_trace}}
+```
+{{/if}}
+
+{{#if partial_analysis}}
+---
+
+## Análise Parcial
+
+{{partial_analysis}}
+{{/if}}
+
+---
+
+## Próximos Passos
+
+1. Verifique manualmente o pod: `kubectl describe pod {{pod_name}} -n {{namespace}}`
+2. Consulte os logs: `kubectl logs {{pod_name}} -n {{namespace}}`
+3. Se o problema persistir, escale para o time responsável
+
+---
+
+*Este é um e-mail automático do sistema Auto-Troubleshooting.*
+*A análise automática falhou, mas o alerta foi encaminhado para sua atenção.*
