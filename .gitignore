@@ -301,6 +301,7 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 mcp-server/dist/
+api/dist/
 
 # Visual Studio 6 build log
 *.plg

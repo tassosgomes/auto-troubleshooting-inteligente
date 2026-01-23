@@ -24,6 +24,30 @@ services:
       - troubleshooting-network
 
   # =============================================================================
+  # API - Consulta de Tickets
+  # =============================================================================
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: troubleshooting-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      - API_PORT=3000
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-troubleshooting}
+      - POSTGRES_USER=${POSTGRES_USER:-troubleshooting}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - troubleshooting-network
+
+  # =============================================================================
   # n8n - Orquestrador de Workflows
   # =============================================================================
   n8n:

@@ -1,4 +1,4 @@
-## status: pending
+## status: completed
 
 <task_context>
 <domain>api/tickets</domain>
@@ -24,15 +24,15 @@ Criar uma API REST simples para consulta de tickets de diagnóstico e registro d
 
 ## Subtarefas
 
-- [ ] 9.1 Criar projeto Node.js/Express para API
-- [ ] 9.2 Configurar conexão com PostgreSQL
-- [ ] 9.3 Implementar GET /api/v1/tickets/{id}
-- [ ] 9.4 Implementar GET /api/v1/tickets?service={name}
-- [ ] 9.5 Implementar POST /api/v1/tickets/{id}/feedback
-- [ ] 9.6 Criar Dockerfile para a API
-- [ ] 9.7 Adicionar ao docker-compose.yml
-- [ ] 9.8 Criar documentação básica dos endpoints
-- [ ] 9.9 Testar endpoints com dados de exemplo
+- [x] 9.1 Criar projeto Node.js/Express para API
+- [x] 9.2 Configurar conexão com PostgreSQL
+- [x] 9.3 Implementar GET /api/v1/tickets/{id}
+- [x] 9.4 Implementar GET /api/v1/tickets?service={name}
+- [x] 9.5 Implementar POST /api/v1/tickets/{id}/feedback
+- [x] 9.6 Criar Dockerfile para a API
+- [x] 9.7 Adicionar ao docker-compose.yml
+- [x] 9.8 Criar documentação básica dos endpoints
+- [x] 9.9 Testar endpoints com dados de exemplo
 
 ## Detalhes de Implementação
 
