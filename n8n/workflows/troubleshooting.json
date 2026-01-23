@@ -156,6 +156,55 @@
     },
     {
       "parameters": {
+        "language": "javascript",
+        "jsCode": "const input = $json;\n\nconst annotationSources = [\n  input?.deployment?.annotations,\n  input?.deployment?.metadata?.annotations,\n  input?.kubernetes?.deployment?.annotations,\n  input?.kubernetes?.deployment?.metadata?.annotations,\n  input?.deployment_annotations,\n];\n\nlet metadataRaw;\nfor (const annotations of annotationSources) {\n  if (annotations && annotations['project.info/metadata']) {\n    metadataRaw = annotations['project.info/metadata'];\n    break;\n  }\n}\n\nlet ownerEmail;\nif (metadataRaw) {\n  try {\n    const parsed = typeof metadataRaw === 'string' ? JSON.parse(metadataRaw) : metadataRaw;\n    ownerEmail = parsed?.owner_email || parsed?.ownerEmail;\n  } catch (error) {\n    ownerEmail = undefined;\n  }\n}\n\nownerEmail = ownerEmail || input.owner_email;\n\nif (!ownerEmail) {\n  ownerEmail = $env.DEFAULT_ALERT_EMAIL || 'devops@empresa.com';\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      owner_email: ownerEmail\n    }\n  }\n];"
+      },
+      "id": "14",
+      "name": "Extrair Email Destinatario",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1960, 120]
+    },
+    {
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const input = $json;\n\nconst classification = String(input.classification || 'unknown');\nconst classificationUpper = classification.toUpperCase();\nconst ticketId = input.ticket_id || input.ticketId || input.report_data?.ticket_id || '';\nconst ticketShort = ticketId ? String(ticketId).slice(0, 8) : '--------';\nconst serviceName = input.service_name || 'serviço não informado';\nconst namespace = input.namespace || 'namespace não informado';\nconst summary = input.summary || input.report_data?.summary || 'Resumo não disponível.';\nconst report = input.diagnosis_report || input.report_markdown || '';\nconst feedbackUrl = input.feedback_url || input.report_data?.feedback_url || '';\n\nconst subject = `[Auto-Troubleshooting] ${classificationUpper} - ${serviceName} - Ticket ${ticketShort}`;\n\nconst emailBody = [\n  '# Diagnóstico Automático',\n  '',\n  `**Ticket ID:** ${ticketId}`,\n  `**Serviço:** ${serviceName}`,\n  `**Namespace:** ${namespace}`,\n  `**Classificação:** ${classification}`,\n  '',\n  '---',\n  '',\n  '## Resumo',\n  '',\n  summary,\n  '',\n  '---',\n  '',\n  '## Relatório Completo',\n  '',\n  report,\n  '',\n  '---',\n  '',\n  '📧 Para dar feedback sobre este diagnóstico, acesse:',\n  feedbackUrl,\n  '',\n  '---',\n  '',\n  '*Este é um e-mail automático do sistema Auto-Troubleshooting Inteligente.*',\n  '*Não responda a este e-mail.*',\n].join('\\n');\n\nreturn [\n  {\n    json: {\n      ...input,\n      email_subject: subject,\n      email_body: emailBody\n    }\n  }\n];"
+      },
+      "id": "15",
+      "name": "Montar Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2180, 120]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$json.owner_email}}",
+        "subject": "={{$json.email_subject}}",
+        "text": "={{$json.email_body}}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "16",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [2400, 120],
+      "settings": {
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000
+      },
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP Corporativo"
+        }
+      }
+    },
+    {
+      "parameters": {
         "responseBody": "ok",
         "responseData": "text",
         "responseCode": 200
@@ -317,6 +366,39 @@
         [
           {
             "node": "Gerar Relatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Relatorio": {
+      "main": [
+        [
+          {
+            "node": "Extrair Email Destinatario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Email Destinatario": {
+      "main": [
+        [
+          {
+            "node": "Montar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Email": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email",
             "type": "main",
             "index": 0
           }

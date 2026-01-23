@@ -1,4 +1,4 @@
-## status: pending
+## status: completed
 
 <task_context>
 <domain>n8n/email</domain>
@@ -24,13 +24,13 @@ Configurar o envio de e-mails com o relatório de diagnóstico via SMTP corporat
 
 ## Subtarefas
 
-- [ ] 8.1 Configurar credenciais SMTP no n8n
-- [ ] 8.2 Criar nó de envio de e-mail no workflow
-- [ ] 8.3 Configurar assunto com Ticket ID e serviço
-- [ ] 8.4 Configurar corpo com relatório Markdown
-- [ ] 8.5 Extrair destinatário de `project.info/metadata`
-- [ ] 8.6 Implementar retry (3x com intervalo de 5s)
-- [ ] 8.7 Testar envio com SMTP de desenvolvimento
+- [x] 8.1 Configurar credenciais SMTP no n8n
+- [x] 8.2 Criar nó de envio de e-mail no workflow
+- [x] 8.3 Configurar assunto com Ticket ID e serviço
+- [x] 8.4 Configurar corpo com relatório Markdown
+- [x] 8.5 Extrair destinatário de `project.info/metadata`
+- [x] 8.6 Implementar retry (3x com intervalo de 5s)
+- [x] 8.7 Testar envio com SMTP de desenvolvimento
 
 ## Detalhes de Implementação
 
@@ -173,3 +173,12 @@ async function sendEmailWithRetry(emailData, attempt = 1) {
 
 - PRD: F-007 (Envio de E-mail)
 - Tech Spec: Seção "SMTP"
+
+## Checklist de Conclusão
+
+- [x] 8.0 Configurar Envio de E-mail via SMTP ✅ CONCLUÍDA
+  - [x] 8.1 Implementação completada
+  - [x] 8.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 8.3 Análise de regras e conformidade verificadas
+  - [x] 8.4 Revisão de código completada
+  - [x] 8.5 Pronto para deploy

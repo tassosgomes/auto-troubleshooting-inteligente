@@ -47,6 +47,13 @@ services:
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
       - GENERIC_TIMEZONE=America/Sao_Paulo
+      # SMTP (envios de e-mail)
+      - SMTP_HOST=${SMTP_HOST:-smtp4dev}
+      - SMTP_PORT=${SMTP_PORT:-25}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM=${SMTP_FROM:-auto-troubleshooting@empresa.com}
+      - DEFAULT_ALERT_EMAIL=${DEFAULT_ALERT_EMAIL:-devops@empresa.com}
       # Conexão com PostgreSQL para persistência do n8n
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
@@ -77,6 +84,21 @@ services:
         source: ${HOME}/.kube
         target: /home/node/.kube
         read_only: true
+    networks:
+      - troubleshooting-network
+
+  # =============================================================================
+  # SMTP Fake - smtp4dev
+  # =============================================================================
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    container_name: troubleshooting-smtp4dev
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+      - "2525:25"
+    environment:
+      - ServerOptions__HostName=smtp4dev
     networks:
       - troubleshooting-network
 
