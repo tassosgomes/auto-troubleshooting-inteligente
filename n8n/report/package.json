@@ -1,0 +1,12 @@
+{
+  "name": "auto-troubleshooting-report",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "generate": "node generate-reports.js"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.8"
+  }
+}

@@ -145,6 +145,17 @@
     },
     {
       "parameters": {
+        "language": "javascript",
+        "jsCode": "const { randomUUID } = require('crypto');\nconst Handlebars = require('handlebars');\n\nHandlebars.registerHelper('inc', (index) => Number(index) + 1);\n\nconst template = [\n  '# 🔍 Diagnóstico de Incidente',\n  '',\n  '**Ticket ID:** `{{ticket_id}}`  ',\n  '**Data:** {{timestamp}}  ',\n  '**Serviço:** {{service_name}}  ',\n  '**Namespace:** {{namespace}}  ',\n  '',\n  '---',\n  '',\n  '## 📋 Resumo Executivo',\n  '',\n  '{{summary}}',\n  '',\n  '## 🏷️ Classificação',\n  '',\n  '| Campo | Valor |',\n  '|-------|-------|',\n  '| **Tipo** | {{classification}} |',\n  '| **Severidade** | {{severity}} |',\n  '| **Confiança** | {{confidence}} |',\n  '',\n  '---',\n  '',\n  '## 🔎 Evidências Coletadas',\n  '',\n  '### Erro Original',\n  '',\n  '```',\n  '{{error_message}}',\n  '```',\n  '',\n  '{{#if stack_trace}}',\n  '### Stack Trace',\n  '',\n  '```',\n  '{{stack_trace}}',\n  '```',\n  '{{/if}}',\n  '',\n  '{{#if kubernetes_evidence}}',\n  '### Análise de Kubernetes',\n  '',\n  '{{kubernetes_evidence}}',\n  '{{/if}}',\n  '',\n  '{{#if code_evidence}}',\n  '### Análise de Código',\n  '',\n  '{{code_evidence}}',\n  '{{/if}}',\n  '',\n  '{{#if network_evidence}}',\n  '### Teste de Conectividade',\n  '',\n  '{{network_evidence}}',\n  '{{/if}}',\n  '',\n  '---',\n  '',\n  '## 🎯 Causa Raiz Identificada',\n  '',\n  '{{root_cause}}',\n  '',\n  '---',\n  '',\n  '## 💡 Sugestões de Correção',\n  '',\n  '{{#each suggestions}}',\n  '{{inc @index}}. {{this}}',\n  '{{/each}}',\n  '',\n  '---',\n  '',\n  '## ⏭️ Próximos Passos',\n  '',\n  '{{#each next_steps}}',\n  '- [ ] {{this}}',\n  '{{/each}}',\n  '',\n  '---',\n  '',\n  '*Este diagnóstico foi gerado automaticamente pelo Auto-Troubleshooting Inteligente.*',\n  '',\n  '*Para análise adicional, você pode usar GitHub Copilot ou Claude Code com este relatório.*',\n  '',\n  '📧 [Dar feedback sobre este diagnóstico]({{feedback_url}})',\n].join('\\n');\n\nconst SECRET_PATTERN = /(password|pass|pwd|secret|token|api[_-]?key|authorization|private[_-]?key|client_secret|access[_-]?token|refresh[_-]?token)\\s*[:=]\\s*[^\\s,;]+/gi;\n\nfunction sanitizeText(text) {\n  if (!text) return '';\n  return String(text).replace(SECRET_PATTERN, (match) => {\n    const key = match.split(/[:=]/)[0];\n    return `${key}: [REDACTED]`;\n  });\n}\n\nfunction sanitizeArray(value) {\n  if (!Array.isArray(value)) return [];\n  return value.map((entry) => sanitizeText(entry)).filter(Boolean);\n}\n\nfunction formatKubernetesEvidence(podDescription, events) {\n  if (!podDescription && !events) return '';\n\n  let output = '';\n  if (podDescription?.name) {\n    output += `**Pod:** ${sanitizeText(podDescription.name)}\\n`;\n  }\n  if (podDescription?.status) {\n    output += `**Status:** ${sanitizeText(podDescription.status)}\\n\\n`;\n  }\n\n  if (podDescription?.containerStatuses?.length) {\n    output += '**Containers:**\\n';\n    for (const container of podDescription.containerStatuses) {\n      const readyLabel = container.ready ? '✅ Ready' : '❌ Not Ready';\n      output += `- ${sanitizeText(container.name)}: ${readyLabel}`;\n      if (Number.isFinite(container.restartCount)) {\n        output += ` (Restarts: ${container.restartCount})`;\n      }\n      output += '\\n';\n\n      if (container.state?.terminated) {\n        output += `  - Terminated: ${sanitizeText(container.state.terminated.reason)}\\n`;\n      }\n      if (container.state?.waiting) {\n        output += `  - Waiting: ${sanitizeText(container.state.waiting.reason)}\\n`;\n      }\n    }\n  }\n\n  if (events?.length) {\n    output += '\\n**Eventos Recentes:**\\n';\n    for (const event of events.slice(-5)) {\n      const icon = event.type === 'Warning' ? '⚠️' : 'ℹ️';\n      output += `${icon} [${sanitizeText(event.reason)}] ${sanitizeText(event.message)}\\n`;\n    }\n  }\n\n  return output.trim();\n}\n\nfunction formatCodeEvidence(filePath, lineNumber, codeSnippet, language = '') {\n  if (!codeSnippet) return '';\n\n  const lines = String(codeSnippet).split('\\n');\n  const safeLineNumber = Number(lineNumber) || 1;\n  const startLine = Math.max(1, safeLineNumber - 5);\n\n  let output = `**Arquivo:** \\`${sanitizeText(filePath || 'arquivo desconhecido')}\\`\\n`;\n  output += `**Linha:** ${safeLineNumber}\\n\\n`;\n  output += `\\`\\`\\`${sanitizeText(language)}\\n`;\n\n  lines.forEach((line, index) => {\n    const currentLine = startLine + index;\n    const marker = currentLine === safeLineNumber ? '>>>' : '   ';\n    output += `${marker} ${currentLine}: ${sanitizeText(line)}\\n`;\n  });\n\n  output += '\\`\\`\\`\\n';\n\n  return output.trim();\n}\n\nfunction formatNetworkEvidence(networkInfo) {\n  if (!networkInfo) return '';\n  if (typeof networkInfo === 'string') return sanitizeText(networkInfo);\n\n  const url = networkInfo.url ? `**URL:** ${sanitizeText(networkInfo.url)}\\n` : '';\n  const status = networkInfo.status_code ? `**Status:** ${sanitizeText(networkInfo.status_code)}\\n` : '';\n  const responseTime = networkInfo.response_time_ms\n    ? `**Tempo de resposta:** ${sanitizeText(networkInfo.response_time_ms)}ms\\n`\n    : '';\n  const error = networkInfo.error ? `**Erro:** ${sanitizeText(networkInfo.error)}\\n` : '';\n\n  return `${url}${status}${responseTime}${error}`.trim();\n}\n\nfunction normalize(value, allowed, fallback) {\n  const normalized = String(value || fallback).toLowerCase();\n  return allowed.includes(normalized) ? normalized : fallback;\n}\n\nconst input = $json;\nconst ticketId = input.ticket_id || input.ticketId || randomUUID();\nconst timestamp = input.timestamp || new Date().toISOString();\n\nconst podDescription = input.pod_description\n  || input.kubernetes_pod_description\n  || input.kubernetes?.podDescription\n  || input.kubernetes?.pod\n  || null;\n\nconst events = input.events\n  || input.kubernetes_events\n  || input.kubernetes?.events\n  || null;\n\nconst kubernetesEvidence = input.kubernetes_evidence\n  || formatKubernetesEvidence(podDescription, events);\n\nconst codeEvidenceDetail = input.code_evidence_detail\n  || input.code\n  || null;\n\nconst codeEvidence = typeof input.code_evidence === 'string'\n  ? input.code_evidence\n  : (codeEvidenceDetail\n    ? formatCodeEvidence(\n      codeEvidenceDetail.filePath || codeEvidenceDetail.file_path,\n      codeEvidenceDetail.lineNumber || codeEvidenceDetail.line_number,\n      codeEvidenceDetail.codeSnippet || codeEvidenceDetail.code_snippet,\n      codeEvidenceDetail.language || codeEvidenceDetail.lang || ''\n    )\n    : '');\n\nconst networkEvidence = input.network_evidence\n  || formatNetworkEvidence(input.network || null);\n\nconst suggestions = sanitizeArray(input.suggestions);\nconst nextSteps = sanitizeArray(input.next_steps || input.nextSteps);\n\nconst reportData = {\n  ticket_id: ticketId,\n  timestamp,\n  service_name: sanitizeText(input.service_name || 'serviço não informado'),\n  namespace: sanitizeText(input.namespace || 'namespace não informado'),\n  summary: sanitizeText(input.summary) || 'Resumo não fornecido; revisar evidências coletadas.',\n  classification: normalize(input.classification, ['infrastructure', 'code', 'unknown'], 'unknown'),\n  severity: normalize(input.severity, ['critical', 'high', 'medium', 'low'], 'medium'),\n  confidence: normalize(input.confidence, ['alta', 'média', 'baixa'], 'média'),\n  error_message: sanitizeText(input.error_message || 'Erro não informado'),\n  stack_trace: sanitizeText(input.stack_trace || ''),\n  kubernetes_evidence: sanitizeText(kubernetesEvidence),\n  code_evidence: sanitizeText(codeEvidence),\n  network_evidence: sanitizeText(networkEvidence),\n  root_cause: sanitizeText(input.root_cause) || 'Causa raiz não identificada automaticamente.',\n  suggestions: suggestions.length\n    ? suggestions\n    : ['Revisar logs completos e métricas do serviço', 'Validar configurações e limites de recursos'],\n  next_steps: nextSteps.length\n    ? nextSteps\n    : ['Confirmar correção em ambiente de homologação', 'Monitorar o serviço após o ajuste'],\n  feedback_url: sanitizeText(input.feedback_url || input.feedbackUrl || input.feedback)\n    || `https://feedback.local/diagnosis/${ticketId}`,\n};\n\nconst compiled = Handlebars.compile(template, { noEscape: true });\nconst report = compiled(reportData);\n\nreturn [\n  {\n    json: {\n      ...input,\n      ticket_id: ticketId,\n      timestamp,\n      diagnosis_report: report,\n      report_markdown: report,\n      report_data: reportData,\n    },\n  },\n];"
+      },
+      "id": "13",
+      "name": "Gerar Relatorio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1740, 120]
+    },
+    {
+      "parameters": {
         "responseBody": "ok",
         "responseData": "text",
         "responseCode": 200
@@ -273,6 +284,39 @@
         [
           {
             "node": "Rota Unknown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rota Infrastructure": {
+      "main": [
+        [
+          {
+            "node": "Gerar Relatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rota Code": {
+      "main": [
+        [
+          {
+            "node": "Gerar Relatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rota Unknown": {
+      "main": [
+        [
+          {
+            "node": "Gerar Relatorio",
             "type": "main",
             "index": 0
           }

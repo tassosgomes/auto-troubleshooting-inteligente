@@ -1,0 +1,86 @@
+# 🔍 Diagnóstico de Incidente
+
+**Ticket ID:** `{{ticket_id}}`  
+**Data:** {{timestamp}}  
+**Serviço:** {{service_name}}  
+**Namespace:** {{namespace}}  
+
+---
+
+## 📋 Resumo Executivo
+
+{{summary}}
+
+## 🏷️ Classificação
+
+| Campo | Valor |
+|-------|-------|
+| **Tipo** | {{classification}} |
+| **Severidade** | {{severity}} |
+| **Confiança** | {{confidence}} |
+
+---
+
+## 🔎 Evidências Coletadas
+
+### Erro Original
+
+```
+{{error_message}}
+```
+
+{{#if stack_trace}}
+### Stack Trace
+
+```
+{{stack_trace}}
+```
+{{/if}}
+
+{{#if kubernetes_evidence}}
+### Análise de Kubernetes
+
+{{kubernetes_evidence}}
+{{/if}}
+
+{{#if code_evidence}}
+### Análise de Código
+
+{{code_evidence}}
+{{/if}}
+
+{{#if network_evidence}}
+### Teste de Conectividade
+
+{{network_evidence}}
+{{/if}}
+
+---
+
+## 🎯 Causa Raiz Identificada
+
+{{root_cause}}
+
+---
+
+## 💡 Sugestões de Correção
+
+{{#each suggestions}}
+{{increment @index}}. {{this}}
+{{/each}}
+
+---
+
+## ⏭️ Próximos Passos
+
+{{#each next_steps}}
+- [ ] {{this}}
+{{/each}}
+
+---
+
+*Este diagnóstico foi gerado automaticamente pelo Auto-Troubleshooting Inteligente.*
+
+*Para análise adicional, você pode usar GitHub Copilot ou Claude Code com este relatório.*
+
+📧 [Dar feedback sobre este diagnóstico]({{feedback_url}})
